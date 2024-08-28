@@ -26,7 +26,7 @@ async function insertEmployees() {
 // getEmployee
 async function getEmployee(empId) {
   try {
-    const employees = await employeeModel.findOne({ empId: empId }).exec();
+    const employees = await employeeModel.findOne({ _id: empId }).exec();
     return employees;
   } catch (error) {
     console.error("Error retrieving employees:", error);
@@ -36,7 +36,7 @@ async function getEmployee(empId) {
 async function updateEmployee(empId, updateUser) {
   try {
     const { deptCode, basicSalary } = updateUser;
-    const filter = { empId: empId };
+    const filter = { _id: empId };
     const employee = await employeeModel.updateOne(filter, {
       deptCode: deptCode,
       basicSalary: basicSalary,
@@ -50,7 +50,7 @@ async function updateEmployee(empId, updateUser) {
 
 async function deleteEmployee(empId) {
   try {
-    return await employeeModel.deleteOne({ empId: empId });
+    return await employeeModel.deleteOne({ _id: empId });
   } catch (error) {
     console.log("error whild delteing ", error);
   }

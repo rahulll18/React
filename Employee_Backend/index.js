@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
-// const bodyParser = require('body-parser')
+const cors = require("cors");
+
 const {
   getEmployee,
   getAllEmployees,
@@ -24,15 +25,12 @@ const mongoDb = require("./config/mongoDb");
 // const db = require("./config/mysqlDb")
 
 app.use(express.json());
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
+
 mongoDb();
 // db();
 
-// app.use(function(req,res,next){
-//     //for validation , authentication , password hashing while registering users
-//     console.log("middlware 1");
-//     next();
-// })
 
 app.get("/", function (req, res) {
   console.log(req);
@@ -111,9 +109,9 @@ app.get("/getEmployees", async function (req, res) {
   }
 });
 
-app.get("/getEmployees/:empId", async function (req, res) {
-    console.log(req.params.empId);
-  const data = await getEmployee(req.params.empId);
+app.get("/getEmployees/:id", async function (req, res) {
+    console.log(req.params.id);
+  const data = await getEmployee(req.params.id);
   res.send(data);
   console.log(data);
 });
@@ -129,10 +127,10 @@ app.post("/employees/add", async function (req, res) {
   }
 });
 
-app.put('/update/:empId' , async function(req , res){
+app.put('/update/:id' , async function(req , res){
   try {
       const updateUser = req.body;
-      const Employee = await updateEmployee(req.params.empId , updateUser)
+      const Employee = await updateEmployee(req.params.id , updateUser)
 
       res.send(Employee)
   } catch (error) {
@@ -140,9 +138,9 @@ app.put('/update/:empId' , async function(req , res){
   }
 })
 
-app.delete('/delete/:empId', async function (req , res){
+app.delete('/delete/:id', async function (req , res){
     try {
-        const deleted = await deleteEmployee(req.params.empId);
+        const deleted = await deleteEmployee(req.params.id);
         res.json(deleted)
     } catch (error) {
         console.log("Error is ",error);

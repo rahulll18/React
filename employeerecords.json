@@ -1,0 +1,24 @@
+{
+
+    "employees" :[
+        {
+            "empId":2, 
+            "empName":"Hari", 
+            "deptCode":"LD", 
+            "basicSalary":67888, 
+            "experience":0, 
+            "emailId":"hari@gmail.com",
+            "joiningDate": "12 July 2023"
+        },
+        {
+            "empId":3, 
+            "empName":"Harish", 
+            "deptCode":"LD", 
+            "basicSalary":89000, 
+            "experience":0, 
+            "emailId":"harish@gmail.com",
+            "joiningDate": "13 July 2023"
+        }
+
+    ]
+}
