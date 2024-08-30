@@ -1,13 +1,14 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-
+const { addProducts, getAllproducts } = require("./api/Productapi");
 const {
   getEmployee,
   getAllEmployees,
   addEmployee,
   deleteEmployee,
   updateEmployee,
+  uploadEmployeePic
 } = require("./api/Employeeapi");
 const {
   getAllUsers,
@@ -22,15 +23,15 @@ const upload = require("./config/multer");
 const PORT = 5000;
 
 const mongoDb = require("./config/mongoDb");
-// const db = require("./config/mysqlDb")
+const db = require("./config/mysqlDb");
 
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 mongoDb();
-// db();
 
+let connection;
 
 app.get("/", function (req, res) {
   console.log(req);
@@ -98,6 +99,28 @@ app.delete("/deleteUser/:userId", async function (req, res) {
   //console.log(deleteUser);
 });
 
+//apis for products with mysql
+
+app.get("/getAllProducts", async (req, res) => {
+  try {
+    const Products = await getAllproducts(connection);
+    res.status(200).send(Products);
+  } catch (error) {
+    console.log("Error while fethcing Products", error);
+  }
+});
+
+app.post("/addProducts", async (req, res) => {
+  try {
+    const product = req.body;
+    const addedProducts = await addProducts(connection, product);
+
+    res.status(200).send(addedProducts);
+  } catch (error) {
+    console.log("Got an error while adding product", error);
+  }
+});
+
 //api with mongodb
 app.get("/getEmployees", async function (req, res) {
   try {
@@ -105,12 +128,12 @@ app.get("/getEmployees", async function (req, res) {
     res.send(employees);
     console.log(employees);
   } catch (error) {
-    console.log("Error while getting all employees",error);
+    console.log("Error while getting all employees", error);
   }
 });
 
 app.get("/getEmployees/:id", async function (req, res) {
-    console.log(req.params.id);
+  console.log(req.params.id);
   const data = await getEmployee(req.params.id);
   res.send(data);
   console.log(data);
@@ -127,26 +150,36 @@ app.post("/employees/add", async function (req, res) {
   }
 });
 
-app.put('/update/:id' , async function(req , res){
+app.put("/upload/:_id", upload.single("profilePic"), async function (request, response) {
+  console.log("in file upload");
+  console.log(request.params._id);
+  console.log(request.file.buffer);
+  const data = await uploadEmployeePic(request.params._id ,request.file.buffer);
+  console.log(data);
+  //response.send(data);
+});
+
+app.put("/update/:id", async function (req, res) {
   try {
-      const updateUser = req.body;
-      const Employee = await updateEmployee(req.params.id , updateUser)
+    const { _id, ...updateUser } = req.body;
+    const Employee = await updateEmployee(req.params.id, updateUser);
 
-      res.send(Employee)
+    res.send(Employee);
   } catch (error) {
-    console.log("error while updating employee",error)
+    console.log("error while updating employee", error);
   }
-})
+});
 
-app.delete('/delete/:id', async function (req , res){
-    try {
-        const deleted = await deleteEmployee(req.params.id);
-        res.json(deleted)
-    } catch (error) {
-        console.log("Error is ",error);
-    }
-})
+app.delete("/delete/:id", async function (req, res) {
+  try {
+    const deleted = await deleteEmployee(req.params.id);
+    res.send(deleted);
+  } catch (error) {
+    console.log("Error is ", error);
+  }
+});
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  connection = await db();
   console.log(`server is listening on port ${PORT}`);
 });

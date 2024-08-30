@@ -8,6 +8,11 @@ const empSchema = new mongoose.Schema({
     experience : Number,
     emailId : String,
     joiningDate: Date,
+    profilePic:{
+        data: Buffer,
+        contentType: String
+    } 
+
 })
 
 const employeeModel = mongoose.model('Employee',empSchema)

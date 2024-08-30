@@ -35,12 +35,8 @@ async function getEmployee(empId) {
 
 async function updateEmployee(empId, updateUser) {
   try {
-    const { deptCode, basicSalary } = updateUser;
     const filter = { _id: empId };
-    const employee = await employeeModel.updateOne(filter, {
-      deptCode: deptCode,
-      basicSalary: basicSalary,
-    });
+    const employee = await employeeModel.updateOne(filter, updateUser);
 
     return employee;
   } catch (error) {
@@ -54,6 +50,18 @@ async function deleteEmployee(empId) {
   } catch (error) {
     console.log("error whild delteing ", error);
   }
+}
+
+async function uploadEmployeePic(_id, profilePic){
+  try{
+    const filter={_id:_id};
+    const updates={profilePic:profilePic};
+    const data =  await employeeModel.updateOne(filter,updates);
+    return data;
+  }catch(error){
+    console.log(error);
+  }
+  
 }
 
 async function addEmployee(employee) {
@@ -72,4 +80,5 @@ module.exports = {
   deleteEmployee,
   addEmployee,
   updateEmployee,
+  uploadEmployeePic
 };
