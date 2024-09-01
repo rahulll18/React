@@ -8,7 +8,7 @@ const {
   addEmployee,
   deleteEmployee,
   updateEmployee,
-  uploadEmployeePic
+  uploadEmployeePic,
 } = require("./api/Employeeapi");
 const {
   getAllUsers,
@@ -150,14 +150,21 @@ app.post("/employees/add", async function (req, res) {
   }
 });
 
-app.put("/upload/:_id", upload.single("profilePic"), async function (request, response) {
-  console.log("in file upload");
-  console.log(request.params._id);
-  console.log(request.file.buffer);
-  const data = await uploadEmployeePic(request.params._id ,request.file.buffer);
-  console.log(data);
-  //response.send(data);
-});
+app.put(
+  "/upload/:_id",
+  upload.single("profilePic"),
+  async function (request, response) {
+    console.log("in file upload");
+    console.log(request.params._id);
+    console.log(request.file.buffer);
+    const data = await uploadEmployeePic(
+      request.params._id,
+      request.file.buffer
+    );
+    console.log(data);
+    //response.send(data);
+  }
+);
 
 app.put("/update/:id", async function (req, res) {
   try {
@@ -180,6 +187,6 @@ app.delete("/delete/:id", async function (req, res) {
 });
 
 app.listen(PORT, async () => {
-  connection = await db();
+  // connection = await db();
   console.log(`server is listening on port ${PORT}`);
 });
