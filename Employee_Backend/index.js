@@ -1,7 +1,13 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const { addProducts, getAllproducts } = require("./api/Productapi");
+const {
+  addProducts,
+  getAllproducts,
+  getProductById,
+  updateProductById,
+  deleteProductById,
+} = require("./api/Productapi");
 const {
   getEmployee,
   getAllEmployees,
@@ -110,9 +116,21 @@ app.get("/getAllProducts", async (req, res) => {
   }
 });
 
-app.post("/addProducts", async (req, res) => {
+app.get("/getProduct/:productId", async (req, res) => {
   try {
-    const product = req.body;
+    const product = await getProductById(connection, req.params.productId);
+    res.status(200).send(product);
+  } catch (error) {
+    console.log("error while fetching product", error);
+  }
+});
+
+app.post("/addProducts", upload.single("ProductImage"), async (req, res) => {
+  try {
+    const productBody = req.body;
+    const ProductImage = req.file.buffer;
+
+    const product = { ...productBody, ProductImage };
     const addedProducts = await addProducts(connection, product);
 
     res.status(200).send(addedProducts);
@@ -121,27 +139,56 @@ app.post("/addProducts", async (req, res) => {
   }
 });
 
+app.put(
+  "/updateProduct/:productId",
+  upload.single("ProductImage"),
+  async (req, res) => {
+    try {
+      const productBody = req.body;
+      const ProductImage = req.file.buffer;
+
+      const newProduct = { ...productBody, ProductImage };
+      const updatedProduct = await updateProductById(
+        connection,
+        req.params.productId,
+        newProduct
+      );
+      res.send(updatedProduct);
+    } catch (error) {
+      console.log("Error while Updating with Product",error);
+    }
+  }
+);
+
+app.delete("/deleteProduct/:productId", async (req, res) => {
+  try {
+    const deletedProduct = await deleteProductById(
+      connection,
+      req.params.productId
+    );
+    res.send(deletedProduct);
+  } catch (error) {
+    console.log("Error while deleting Product");
+  }
+});
+
 //api with mongodb
 app.get("/getEmployees", async function (req, res) {
   try {
     const employees = await getAllEmployees();
     res.send(employees);
-    console.log(employees);
   } catch (error) {
     console.log("Error while getting all employees", error);
   }
 });
 
 app.get("/getEmployees/:id", async function (req, res) {
-  console.log(req.params.id);
   const data = await getEmployee(req.params.id);
   res.send(data);
-  console.log(data);
 });
 
 app.post("/employees/add", async function (req, res) {
-  console.log("Request Body:", req.body);
-  try {
+ try {
     const data = await addEmployee(req.body);
     res.send(data);
   } catch (error) {
@@ -154,15 +201,11 @@ app.put(
   "/upload/:_id",
   upload.single("profilePic"),
   async function (request, response) {
-    console.log("in file upload");
-    console.log(request.params._id);
-    console.log(request.file.buffer);
     const data = await uploadEmployeePic(
       request.params._id,
       request.file.buffer
     );
-    console.log(data);
-    //response.send(data);
+    response.send(data);
   }
 );
 
@@ -187,6 +230,6 @@ app.delete("/delete/:id", async function (req, res) {
 });
 
 app.listen(PORT, async () => {
-  // connection = await db();
+  connection = await db();
   console.log(`server is listening on port ${PORT}`);
 });
