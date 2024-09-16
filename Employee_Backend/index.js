@@ -29,7 +29,7 @@ const upload = require("./config/multer");
 const PORT = 5000;
 
 const mongoDb = require("./config/mongoDb");
-const db = require("./config/mysqlDb");
+// const db = require("./config/mysqlDb");
 
 app.use(express.json());
 app.use(cors());
@@ -37,7 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 
 mongoDb();
 
-let connection;
+// let connection;
 
 app.get("/", function (req, res) {
   console.log(req);
@@ -230,6 +230,6 @@ app.delete("/delete/:id", async function (req, res) {
 });
 
 app.listen(PORT, async () => {
-  connection = await db();
+  // connection = await db();
   console.log(`server is listening on port ${PORT}`);
 });
